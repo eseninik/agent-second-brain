@@ -11,7 +11,7 @@ Before processing daily entries:
 
 2. **Read yearly goals:**
    ```
-   Read goals/1-yearly-2025.md → Know active goals by area
+   Read goals/1-yearly-2025.md (или 1-yearly-2026.md) → Know active goals by area
    ```
 
 3. **Check monthly priorities:**
@@ -51,11 +51,11 @@ If task aligns with goals, consider priority bump:
 When saving to thoughts/:
 
 1. **Check goal relevance:**
-   - Scan goals/1-yearly-2025.md for matching areas
+   - Scan goals/1-yearly-2025.md или goals/1-yearly-2026.md for matching areas
    - If matches → add link in frontmatter:
      ```yaml
      related:
-       - "[[goals/1-yearly-2025#Career & Business]]"
+       - "[[goals/1-yearly-2026#Career & Business]]"
      ```
 
 2. **Tag with goal area:**
@@ -98,13 +98,20 @@ Look for pattern:
 > [THE ONE THING]
 ```
 
-### 1-yearly-2025.md — Find Active Goals
+### 1-yearly-2026.md (or 2025.md) — Find Active Goals
 
-Look for tables:
+Look for tables or structured goals:
 ```markdown
 | Goal | Progress | Status |
 |------|----------|--------|
 | Goal name | X% | 🟡 |
+```
+
+Or look for sections:
+```markdown
+## Career & Business
+- Goal: CTO с долей 2-3% в ИИ-стартапе
+- Progress: [track based on tasks]
 ```
 
 ### 2-monthly.md — Find Top 3
@@ -118,18 +125,40 @@ Look for section:
 3. **[Priority 3]**
 ```
 
-## Example Alignment
+## Example Alignment (Nikita's Real Scenario)
 
-Entry: "Нужно подготовить презентацию для клиента X"
+**Entry:** "Внести правки в бот база знаний по фидбэку от Кати"
 
-Check:
-- ONE Big Thing: "Ship MVP" → Not related
-- Monthly #1: "Client deliverables" → ✅ Related
-- Yearly: "Client Revenue" → ✅ Related
+**Check:**
+- ONE Big Thing (week): "Доработать текущие 5 проектов для ОП" → ✅ Related
+- Monthly #1: "Закрыть 5 проектов для отдела продаж" → ✅ Related
+- Yearly: "CTO с долей в Migrator, доказать ценность" → ✅ Related
 
-Result:
+**Result:**
 ```
-Task: Подготовить презентацию для клиента X
-Description: → Monthly: Client deliverables → Goal: Client Revenue
-Priority: p2 (boosted from p3)
+Title: Внести правки в бот база знаний
+Description: По фидбэку от Кати → Weekly focus: Доработка проектов → Monthly: ОП проекты
+Priority: 5 (Highest) — aligned with ONE Big Thing + Monthly #1
+Project: Migrator Work
+Tags: #migrator #urgent
+Due: this week (до пятницы)
+```
+
+---
+
+**Entry 2:** "Показать MVP проекта для отдела исполнения Павлу"
+
+**Check:**
+- ONE Big Thing (week): "Начать разработку проекта для отдела исполнения + показать MVP Павлу в пятницу" → ✅ Related
+- Monthly #1: "Закрыть 5 проектов" → ✅ Related (новый проект = доп. ценность)
+- Yearly: "CTO с долей, доказать ценность" → ✅ Related
+
+**Result:**
+```
+Title: Созвон с Павлом — показать MVP
+Description: Проект для отдела исполнения → Weekly focus: Новый проект
+Priority: 5 (Highest)
+Project: Migrator Work
+Tags: #migrator #собственник
+Due: пятница (31 января)
 ```

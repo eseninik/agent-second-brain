@@ -2,6 +2,39 @@
 
 Voice-first personal assistant for capturing thoughts and managing tasks via Telegram.
 
+## EVERY SESSION BOOTSTRAP
+
+**Before doing anything else, read these files in order:**
+
+1. `vault/MEMORY.md` — curated long-term memory (preferences, decisions, context)
+2. `vault/daily/YYYY-MM-DD.md` — today's entries
+3. `vault/daily/YYYY-MM-DD.md` — yesterday's entries (for continuity)
+4. `vault/goals/3-weekly.md` — this week's ONE Big Thing
+
+**Don't ask permission, just do it.** This ensures context continuity across sessions.
+
+---
+
+## SESSION END PROTOCOL
+
+**Before ending a significant session, write to today's daily:**
+
+```markdown
+## HH:MM [text]
+Session summary: [what was discussed/decided/created]
+- Key decision: [if any]
+- Created: [[link]] [if any files created]
+- Next action: [if any]
+```
+
+**Also update `vault/MEMORY.md` if:**
+- New key decision was made
+- User preference discovered
+- Important fact learned
+- Active context changed significantly
+
+---
+
 ## Mission
 
 Help user stay aligned with goals, capture valuable insights, and maintain clarity.
@@ -45,7 +78,7 @@ Run daily processing via `/process` command or automatically at 21:00.
 
 ### Process Flow:
 1. Read goals/ → understand priorities
-2. Check Todoist → know workload
+2. Check TickTick → know workload
 3. Read daily/ → classify entries
 4. Create tasks → aligned with goals
 5. Save thoughts → build [[links]]
@@ -56,7 +89,8 @@ Run daily processing via `/process` command or automatically at 21:00.
 | Skill | Purpose |
 |-------|---------|
 | `dbrain-processor` | Main daily processing |
-| `todoist-ai` | Task management via MCP |
+| `ticktick-mcp` | Task management via MCP |
+| `graph-builder` | Vault link analysis and building |
 
 ## Available Agents
 
@@ -77,7 +111,7 @@ See `.claude/rules/` for format requirements:
 
 ## MCP Servers
 
-- `todoist` — Task management (add, find, complete tasks)
+- `ticktick` — Task management (create, search, complete tasks)
 - `filesystem` — Vault file access
 
 ## CRITICAL: Tool Usage Policy
@@ -86,7 +120,7 @@ See `.claude/rules/` for format requirements:
 
 Не существует ситуации, когда MCP tools "недоступны". Если ты получил эту инструкцию — у тебя есть доступ к:
 
-- `mcp__todoist__*` — все Todoist операции
+- `mcp__ticktick__*` — все TickTick операции
 - File read/write — все файловые операции
 
 ЗАПРЕЩЁННЫЕ ПАТТЕРНЫ (НИКОГДА не делай это):
@@ -96,7 +130,7 @@ See `.claude/rules/` for format requirements:
 - Любые инструкции для ручного выполнения
 
 ПРАВИЛЬНЫЙ ПАТТЕРН:
-1. Вызвать mcp__todoist__add-tasks tool
+1. Вызвать mcp__ticktick__create_task tool
 2. Получить результат (успех или ошибка)
 3. Включить результат в HTML отчёт
 
@@ -118,6 +152,7 @@ Reports use Telegram HTML:
 | `/weekly` | Generate weekly digest |
 | `/align` | Check goal alignment |
 | `/organize` | Organize vault |
+| `/graph` | Analyze vault links |
 
 ## /do Command Context
 
@@ -140,13 +175,14 @@ When invoked via /do, Claude receives arbitrary user requests. Common patterns:
 
 ## MCP Tools Available
 
-**Todoist (mcp__todoist__*):**
-- `add-tasks` — создать задачи
-- `find-tasks` — найти задачи по тексту
-- `find-tasks-by-date` — задачи за период
-- `update-tasks` — изменить задачи
-- `complete-tasks` — завершить задачи
-- `user-info` — информация о пользователе
+**TickTick (mcp__ticktick__*):**
+- `create_task` — создать задачу
+- `search_tasks` — найти задачи по тексту
+- `get_tasks_due_this_week` — задачи на неделю
+- `get_tasks_due_today` — задачи на сегодня
+- `update_task` — изменить задачу
+- `complete_task` — завершить задачу
+- `get_projects` — список проектов
 
 **Filesystem:**
 - Read/write vault files
@@ -156,7 +192,31 @@ When invoked via /do, Claude receives arbitrary user requests. Common patterns:
 
 For personal overrides: create `CLAUDE.local.md`
 
+## Graph Builder
+
+Analyze and maintain vault link structure. Use `/graph` command or invoke `graph-builder` skill.
+
+**Commands:**
+- `/graph analyze` — Full vault statistics
+- `/graph orphans` — List unconnected notes
+- `/graph suggest` — Get link suggestions
+- `/graph add` — Apply suggested links
+
+**Scripts:**
+- `uv run .claude/skills/graph-builder/scripts/analyze.py` — Graph analysis
+- `uv run .claude/skills/graph-builder/scripts/add_links.py` — Link suggestions
+
+See `skills/graph-builder/` for full documentation.
+
+## Learnings (from experience)
+
+1. **Don't rewrite working code** without reason (KISS, DRY, YAGNI)
+2. **Don't add checks** that weren't there — let the agent decide
+3. **Don't propose solutions** without studying git log/diff first
+4. **Don't break architecture** (process.sh → Claude → skill is correct)
+5. **Problems are usually simple** (e.g., sed one-liner for HTML fix)
+
 ---
 
-*System Version: 2.0*
-*Updated: 2024-12-20*
+*System Version: 2.3*
+*Updated: 2026-02-02*

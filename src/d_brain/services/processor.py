@@ -1,12 +1,13 @@
 """Claude processing service."""
 
-import json
 import logging
 import os
 import subprocess
 from datetime import date
 from pathlib import Path
 from typing import Any
+
+from d_brain.services.session import SessionStore
 
 logger = logging.getLogger(__name__)
 
@@ -16,9 +17,9 @@ DEFAULT_TIMEOUT = 1200  # 20 minutes
 class ClaudeProcessor:
     """Service for triggering Claude Code processing."""
 
-    def __init__(self, vault_path: Path, todoist_api_key: str = "") -> None:
+    def __init__(self, vault_path: Path, ticktick_api_key: str = "") -> None:
         self.vault_path = Path(vault_path)
-        self.todoist_api_key = todoist_api_key
+        self.ticktick_api_key = ticktick_api_key
         self._mcp_config_path = (self.vault_path.parent / "mcp-config.json").resolve()
 
     def _load_skill_content(self) -> str:
@@ -32,12 +33,39 @@ class ClaudeProcessor:
             return skill_path.read_text()
         return ""
 
-    def _load_todoist_reference(self) -> str:
-        """Load Todoist reference for inclusion in prompt."""
-        ref_path = self.vault_path / ".claude/skills/dbrain-processor/references/todoist.md"
+    def _load_ticktick_reference(self) -> str:
+        """Load TickTick reference for inclusion in prompt."""
+        ref_path = self.vault_path / ".claude/skills/dbrain-processor/references/ticktick.md"
         if ref_path.exists():
             return ref_path.read_text()
         return ""
+
+    def _get_session_context(self, user_id: int) -> str:
+        """Get today's session context for Claude.
+
+        Args:
+            user_id: Telegram user ID
+
+        Returns:
+            Recent session entries formatted for inclusion in prompt.
+        """
+        if user_id == 0:
+            return ""
+
+        session = SessionStore(self.vault_path)
+        today_entries = session.get_today(user_id)
+        if not today_entries:
+            return ""
+
+        lines = ["=== TODAY'S SESSION ==="]
+        for entry in today_entries[-10:]:
+            ts = entry.get("ts", "")[11:16]  # HH:MM from ISO
+            entry_type = entry.get("type", "unknown")
+            text = entry.get("text", "")[:80]
+            if text:
+                lines.append(f"{ts} [{entry_type}] {text}")
+        lines.append("=== END SESSION ===\n")
+        return "\n".join(lines)
 
     def _html_to_markdown(self, html: str) -> str:
         """Convert Telegram HTML to Obsidian Markdown."""
@@ -126,12 +154,12 @@ week: {year}-W{week:02d}
 {skill_content}
 === END SKILL ===
 
-ПЕРВЫМ ДЕЛОМ: вызови mcp__todoist__user-info чтобы убедиться что MCP работает.
+ПЕРВЫМ ДЕЛОМ: вызови mcp__ticktick__get_projects чтобы убедиться что MCP работает.
 
 CRITICAL MCP RULE:
-- ТЫ ИМЕЕШЬ ДОСТУП к mcp__todoist__* tools — ВЫЗЫВАЙ ИХ НАПРЯМУЮ
+- ТЫ ИМЕЕШЬ ДОСТУП к mcp__ticktick__* tools — ВЫЗЫВАЙ ИХ НАПРЯМУЮ
 - НИКОГДА не пиши "MCP недоступен" или "добавь вручную"
-- Для задач: вызови mcp__todoist__add-tasks tool
+- Для задач: вызови mcp__ticktick__create_task tool
 - Если tool вернул ошибку — покажи ТОЧНУЮ ошибку в отчёте
 
 CRITICAL OUTPUT FORMAT:
@@ -142,14 +170,14 @@ CRITICAL OUTPUT FORMAT:
 - If entries already processed, return status report in same HTML format"""
 
         try:
-            # Pass TODOIST_API_KEY to Claude subprocess
+            # Pass TICKTICK_API_KEY to Claude subprocess
             env = os.environ.copy()
-            if self.todoist_api_key:
-                env["TODOIST_API_KEY"] = self.todoist_api_key
+            if self.ticktick_api_key:
+                env["TICKTICK_API_KEY"] = self.ticktick_api_key
 
             result = subprocess.run(
                 [
-                    "/home/shima/.local/bin/claude",
+                    "claude",
                     "--print",
                     "--dangerously-skip-permissions",
                     "--mcp-config",
@@ -198,19 +226,21 @@ CRITICAL OUTPUT FORMAT:
                 "processed_entries": 0,
             }
 
-    def execute_prompt(self, user_prompt: str) -> dict[str, Any]:
+    def execute_prompt(self, user_prompt: str, user_id: int = 0) -> dict[str, Any]:
         """Execute arbitrary prompt with Claude.
 
         Args:
             user_prompt: User's natural language request
+            user_id: Telegram user ID for session context
 
         Returns:
             Execution report as dict
         """
         today = date.today()
 
-        # Load todoist reference for task operations
-        todoist_ref = self._load_todoist_reference()
+        # Load context
+        ticktick_ref = self._load_ticktick_reference()
+        session_context = self._get_session_context(user_id)
 
         prompt = f"""Ты - персональный ассистент d-brain.
 
@@ -218,14 +248,14 @@ CONTEXT:
 - Текущая дата: {today}
 - Vault path: {self.vault_path}
 
-=== TODOIST REFERENCE ===
-{todoist_ref}
+{session_context}=== TICKTICK REFERENCE ===
+{ticktick_ref}
 === END REFERENCE ===
 
-ПЕРВЫМ ДЕЛОМ: вызови mcp__todoist__user-info чтобы убедиться что MCP работает.
+ПЕРВЫМ ДЕЛОМ: вызови mcp__ticktick__get_projects чтобы убедиться что MCP работает и получить список проектов.
 
 CRITICAL MCP RULE:
-- ТЫ ИМЕЕШЬ ДОСТУП к mcp__todoist__* tools — ВЫЗЫВАЙ ИХ НАПРЯМУЮ
+- ТЫ ИМЕЕШЬ ДОСТУП к mcp__ticktick__* tools — ВЫЗЫВАЙ ИХ НАПРЯМУЮ
 - НИКОГДА не пиши "MCP недоступен" или "добавь вручную"
 - Если tool вернул ошибку — покажи ТОЧНУЮ ошибку в отчёте
 
@@ -241,17 +271,17 @@ CRITICAL OUTPUT FORMAT:
 
 EXECUTION:
 1. Analyze the request
-2. Call MCP tools directly (mcp__todoist__*, read/write files)
+2. Call MCP tools directly (mcp__ticktick__*, read/write files)
 3. Return HTML status report with results"""
 
         try:
             env = os.environ.copy()
-            if self.todoist_api_key:
-                env["TODOIST_API_KEY"] = self.todoist_api_key
+            if self.ticktick_api_key:
+                env["TICKTICK_API_KEY"] = self.ticktick_api_key
 
             result = subprocess.run(
                 [
-                    "/home/shima/.local/bin/claude",
+                    "claude",
                     "--print",
                     "--dangerously-skip-permissions",
                     "--mcp-config",
@@ -299,12 +329,12 @@ EXECUTION:
 
         prompt = f"""Сегодня {today}. Сгенерируй недельный дайджест.
 
-ПЕРВЫМ ДЕЛОМ: вызови mcp__todoist__user-info чтобы убедиться что MCP работает.
+ПЕРВЫМ ДЕЛОМ: вызови mcp__ticktick__get_projects чтобы убедиться что MCP работает.
 
 CRITICAL MCP RULE:
-- ТЫ ИМЕЕШЬ ДОСТУП к mcp__todoist__* tools — ВЫЗЫВАЙ ИХ НАПРЯМУЮ
+- ТЫ ИМЕЕШЬ ДОСТУП к mcp__ticktick__* tools — ВЫЗЫВАЙ ИХ НАПРЯМУЮ
 - НИКОГДА не пиши "MCP недоступен" или "добавь вручную"
-- Для выполненных задач: вызови mcp__todoist__find-completed-tasks tool
+- Для поиска задач: вызови mcp__ticktick__get_all_tasks или mcp__ticktick__search_tasks
 - Если tool вернул ошибку — покажи ТОЧНУЮ ошибку в отчёте
 
 WORKFLOW:
@@ -322,12 +352,12 @@ CRITICAL OUTPUT FORMAT:
 
         try:
             env = os.environ.copy()
-            if self.todoist_api_key:
-                env["TODOIST_API_KEY"] = self.todoist_api_key
+            if self.ticktick_api_key:
+                env["TICKTICK_API_KEY"] = self.ticktick_api_key
 
             result = subprocess.run(
                 [
-                    "/home/shima/.local/bin/claude",
+                    "claude",
                     "--print",
                     "--dangerously-skip-permissions",
                     "--mcp-config",

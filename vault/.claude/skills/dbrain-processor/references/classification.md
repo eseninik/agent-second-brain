@@ -1,28 +1,15 @@
 # Entry Classification
 
-<!--
-╔══════════════════════════════════════════════════════════════════╗
-║  КАК НАСТРОИТЬ ЭТОТ ФАЙЛ                                         ║
-╠══════════════════════════════════════════════════════════════════╣
-║  1. Замените [Your Client Names] на имена ваших клиентов        ║
-║  2. Замените [Your Company] на название вашей компании          ║
-║  3. Замените [@your_channel] на ваш Telegram-канал              ║
-║  4. Добавьте свои домены работы, если они отличаются            ║
-║  5. Удалите этот комментарий после настройки                    ║
-╚══════════════════════════════════════════════════════════════════╝
--->
-
 ## Work Domains → Categories
 
 Based on user's work context (see [ABOUT.md](ABOUT.md)):
 
-### Client Work
-Брифы, стратегии, креатив, кампании, KPI, предложения
+### Migrator Work
+ИИ-проекты для отделов компании (ОП, отдел исполнения), автоматизация процессов, задачи для собственника
 
-<!-- Добавьте имена ваших клиентов через запятую -->
-**Keywords:** [Your Client Names], клиент, бриф, презентация, дедлайн, KPI
+**Keywords:** Migrator, ОП, отдел продаж, отдел исполнения, собственник, бот-квалификатор, бот база знаний, оценка звонков, рейтинг ОП, NPC, контроль качества, помощник, дедлайн, презентация, срочно, критично
 
-**→ Category:** task (p1-p2) → Todoist
+**→ Category:** task (p1-p2) → TickTick
 
 ### AI & Tech
 Инструменты, модели, промпты, пайплайны, агенты
@@ -31,26 +18,24 @@ Based on user's work context (see [ABOUT.md](ABOUT.md)):
 
 **→ Category:** learning или project → thoughts/
 
-### Product
-Идеи, гипотезы, MVP, юнит-экономика
+### Product (ИИ-стартап)
+Идеи для будущего ИИ-стартапа внутри Migrator, гипотезы, MVP, бизнес-модель
 
-**Keywords:** продукт, SaaS, MVP, гипотеза, монетизация, юнит-экономика, стартап
+**Keywords:** продукт, SaaS, MVP, гипотеза, монетизация, юнит-экономика, стартап, ИИ-стартап, опционы
 
 **→ Category:** idea или project → thoughts/
 
 ### Company Ops
-Команда, процессы, автоматизация, найм, управление, финансы
+Команда Migrator, процессы, управление, карьерный рост, взаимодействие с собственником
 
-<!-- Замените [Your Company] на название вашей компании/проекта -->
-**Keywords:** команда, найм, процесс, HR, финансы, [Your Company]
+**Keywords:** команда, процесс, управление, карьера, CTO, доля, опционы, собственник, встреча, фидбэк, Migrator
 
 **→ Category:** task или project (depends on urgency)
 
 ### Content
-Посты, идеи, тезисы для Telegram и LinkedIn
+Посты, идеи, тезисы для будущего Telegram-канала и LinkedIn (личный бренд)
 
-<!-- Замените [@your_channel] на ваш Telegram-канал или удалите если не нужно -->
-**Keywords:** пост, [@your_channel], LinkedIn, контент, тезис, статья
+**Keywords:** пост, Telegram, LinkedIn, контент, тезис, статья, личный бренд, экспертиза
 
 **→ Category:** idea → thoughts/ideas/ или task если с дедлайном
 
@@ -61,26 +46,26 @@ Based on user's work context (see [ABOUT.md](ABOUT.md)):
 ```
 Entry text contains...
 │
-├─ Client brand or deadline? ────────────────────> TASK (p1-p2)
-│  ([Your Clients], клиент, дедлайн, презентация)
+├─ Migrator project or deadline? ────────────────> TASK (p1-p2)
+│  (ОП, собственник, бот, срочно, дедлайн, презентация)
 │
 ├─ Operational/urgent? ──────────────────────────> TASK (p2-p3)
 │  (нужно сделать, не забыть, позвонить, встреча)
 │
 ├─ AI/tech learning? ────────────────────────────> LEARNING
-│  (узнал, модель, агент, интеграция)
+│  (узнал, модель, агент, интеграция, курс, книга)
 │
 ├─ Product/SaaS idea? ───────────────────────────> IDEA или PROJECT
-│  (продукт, MVP, гипотеза, SaaS)
+│  (продукт, MVP, гипотеза, SaaS, ИИ-стартап)
 │
 ├─ Strategic thinking? ──────────────────────────> PROJECT
-│  (стратегия, план, R&D, долгосрочно)
+│  (стратегия, план, R&D, долгосрочно, карьера, CTO)
 │
 ├─ Personal insight? ────────────────────────────> REFLECTION
-│  (понял, осознал, философия)
+│  (понял, осознал, рефлексия, отношения, здоровье)
 │
 └─ Content idea? ────────────────────────────────> IDEA
-   (пост, тезис, контент)
+   (пост, тезис, контент, Telegram, LinkedIn)
 ```
 
 ## Apply Decision Filters
@@ -101,9 +86,10 @@ For `[photo]` entries:
 
 1. Analyze image content via vision
 2. Determine domain:
-   - Screenshot клиентского материала → Client Work
+   - Screenshot проекта Migrator → Migrator Work
    - Схема/диаграмма → AI & Tech или Product
-   - Текст/статья → Learning
+   - Текст/статья/книга → Learning
+   - Скриншот личных целей → Reflection
 3. Add description to daily file
 
 ---
@@ -112,9 +98,9 @@ For `[photo]` entries:
 
 | Category | Destination | Priority |
 |----------|-------------|----------|
-| task (client) | Todoist | p1-p2 |
-| task (ops) | Todoist | p2-p3 |
-| task (content) | Todoist | p3-p4 |
+| task (Migrator) | TickTick | p1-p2 |
+| task (ops) | TickTick | p2-p3 |
+| task (content) | TickTick | p3-p4 |
 | idea | thoughts/ideas/ | — |
 | reflection | thoughts/reflections/ | — |
 | project | thoughts/projects/ | — |
@@ -130,9 +116,10 @@ thoughts/{category}/{YYYY-MM-DD}-short-title.md
 
 Examples:
 ```
-thoughts/ideas/2024-12-16-saas-pricing-model.md
-thoughts/projects/2024-12-16-ai-agents-pipeline.md
-thoughts/learnings/2024-12-16-claude-mcp-setup.md
+thoughts/ideas/2026-01-26-ai-startup-pricing-model.md
+thoughts/projects/2026-01-26-migrator-automation-pipeline.md
+thoughts/learnings/2026-01-26-claude-mcp-setup.md
+thoughts/reflections/2026-01-26-career-growth-insights.md
 ```
 
 ---
@@ -145,7 +132,7 @@ Use preferred format:
 ---
 date: {YYYY-MM-DD}
 type: {category}
-domain: {Client Work|AI & Tech|Product|Agency Ops|Content}
+domain: {Migrator Work|AI & Tech|Product|Company Ops|Content|Personal}
 tags: [tag1, tag2]
 ---
 
@@ -156,8 +143,7 @@ tags: [tag1, tag2]
 [Ключевая идея]
 
 ## Implication
-<!-- Замените [Your Company] на название вашей компании -->
-[Что это значит для [Your Company]/продукта/стратегии]
+[Что это значит для Migrator/ИИ-стартапа/карьеры/личных целей]
 
 ## Next Action
 [Конкретный шаг — не абстрактный]
@@ -186,8 +172,11 @@ MOC/MOC-{category}s.md
 Group by domain when relevant:
 ```markdown
 ## AI & Tech
-- [[2024-12-16-claude-mcp-setup]] - MCP integration
+- [[2026-01-26-claude-mcp-setup]] - MCP integration for dbrain
 
-## Product
-- [[2024-12-16-saas-pricing-model]] - Pricing research
+## Product (ИИ-стартап)
+- [[2026-01-26-ai-startup-pricing]] - Pricing research for future product
+
+## Migrator Work
+- [[2026-01-26-bot-qualifier-improvements]] - Bot-квалификатор optimization
 ```

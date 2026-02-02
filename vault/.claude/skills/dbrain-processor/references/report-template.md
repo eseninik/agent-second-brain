@@ -80,23 +80,43 @@ Count created, list with priority and due date.
 Format: • Task name <i>(p2, friday)</i>
 
 ### Week Load (📅)
-Call find-tasks-by-date for 7 days.
-Format: Пн: 4 | Вт: 2 | ...
+Call get_tasks_due_this_week from TickTick, group by day.
+Format: Пн: 4 | Вт: 2 | Ср: 3 | Чт: 1 | Пт: 5 ⚠️ | Сб: 0 | Вс: 0
+
+Show ⚠️ if day has 4+ tasks (overloaded).
 
 ### Attention (⚠️)
-Show only if issues exist.
-Check overdue tasks and stale goals (7+ days no activity).
+ALWAYS show this section with:
+1. **Overdue tasks** — use get_overdue_tasks from TickTick
+2. **Stale goals** — goals with 7+ days no activity (SHOW EVERY DAY)
+3. **Overloaded days** — days with 4+ tasks
+
+Format:
+```
+<b>⚠️ Требует внимания:</b>
+• 2 просроченные задачи
+• Цель "Чтение книг" без активности 9 дней
+• Пятница перегружена (5 задач)
+```
 
 ### Links (🔗)
 Show only if new links created.
 Format: • [[Note A]] ↔ [[Note B]]
 
 ### Priorities (⚡)
-Get tomorrow's tasks from Todoist, sort by priority, show top 3.
+Get tomorrow's tasks from TickTick (use get_tasks_due_tomorrow), sort by priority, show top 3.
+Format: • Task name <i>(connected to goal if aligned)</i>
 
 ### Goals Progress (📈)
-Read goals/1-yearly-2026.md, show goals with recent activity.
+Read goals/1-yearly-2026.md (or 1-yearly-2025.md), show goals with recent activity.
 Emojis: 🔴 0-25%, 🟡 26-50%, 🟢 51-75%, ✅ 76-100%
+
+**CRITICAL:** Show goal stale alerts EVERY DAY if goal has no activity for 7+ days.
+Format:
+```
+<b>⚠️ Требует внимания:</b>
+• Цель "Чтение книг" без активности 9 дней
+```
 
 ## Error Report
 
@@ -128,3 +148,43 @@ Before returning report:
 3. No markdown syntax
 4. No tables
 5. Length under 4096 chars
+
+---
+
+## Example Report (Nikita's Real Scenario)
+
+📊 <b>Обработка за 26 января 2026</b>
+
+<b>🎯 Текущий фокус:</b>
+Доработать текущие 5 проектов для ОП + начать новый проект для отдела исполнения
+
+<b>📓 Сохранено мыслей:</b> 2
+• 💡 AI-автоматизация для ОП → ideas/
+• 🪞 Разговор с Полиной — подготовка → reflections/
+
+<b>✅ Создано задач:</b> 5
+• Внести правки в бот база знаний <i>(Highest, среда)</i>
+• Доработать бот контроля качества <i>(Highest, четверг)</i>
+• Созвон с Павлом — показать MVP <i>(Highest, пятница)</i>
+• Тренировка на площадке <i>(Medium, завтра)</i>
+• Прочитать главу 3 "Atomic Habits" <i>(Medium, вторник)</i>
+
+<b>📅 Загрузка на неделю:</b>
+Пн: 3 | Вт: 4 | Ср: 5 ⚠️ | Чт: 4 | Пт: 6 ⚠️ | Сб: 1 | Вс: 0
+
+<b>⚠️ Требует внимания:</b>
+• 1 просроченная задача: "Отправить отчёт собственнику"
+• Среда и пятница перегружены (5-6 задач)
+
+<b>⚡ Топ-3 приоритета на завтра:</b>
+1. Внести правки в бот для оценки переписок <i>(→ Monthly: ОП проекты)</i>
+2. Начать MVP для отдела исполнения <i>(→ Weekly focus)</i>
+3. Тренировка на площадке <i>(→ Goal: Здоровье)</i>
+
+<b>📈 Прогресс по целям:</b>
+• Закрыть 5 проектов для ОП: 80% ✅ (доработка финальная)
+• CTO с долей в Migrator: 60% 🟢 (активно доказываю ценность)
+• Чтение 30+ книг: 8% 🔴 (3 книги за месяц)
+
+---
+<i>Обработано за 1.2 сек</i>

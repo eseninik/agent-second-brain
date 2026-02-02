@@ -21,11 +21,10 @@ Analyzes the past week and generates comprehensive digest report.
    daily/YYYY-MM-DD.md (7 files)
    ```
 
-2. **Get completed tasks from Todoist:**
+2. **Get tasks from TickTick:**
    ```
-   mcp__todoist__find-completed-tasks
-     since: {monday}
-     until: {sunday}
+   mcp__ticktick__get_all_tasks
+   mcp__ticktick__search_tasks (for completed)
    ```
 
 3. **Get current goals:**
