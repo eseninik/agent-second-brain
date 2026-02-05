@@ -1,5 +1,6 @@
 """Telegram bot initialization and polling."""
 
+import asyncio
 import logging
 from collections.abc import Awaitable, Callable
 from typing import Any
@@ -11,6 +12,8 @@ from aiogram.fsm.storage.memory import MemoryStorage
 from aiogram.types import Update
 
 from d_brain.config import Settings
+from d_brain.services import scheduler
+from d_brain.services.ticktick_notifier import TickTickNotifier
 
 logger = logging.getLogger(__name__)
 
@@ -81,15 +84,22 @@ def create_auth_middleware(settings: Settings) -> MiddlewareType:
 
 
 async def run_bot(settings: Settings) -> None:
-    """Run the bot with polling."""
+    """Run the bot with polling, daily scheduler, and TickTick notifier."""
     bot = create_bot(settings)
     dp = create_dispatcher()
 
     # Always add auth middleware for security (it handles allow_all_users internally)
     dp.update.middleware(create_auth_middleware(settings))
 
-    logger.info("Starting bot polling...")
+    notifier = TickTickNotifier(bot, settings)
+
+    logger.info("Starting bot polling + scheduler + notifier...")
     try:
-        await dp.start_polling(bot, allowed_updates=dp.resolve_used_update_types())
+        async with asyncio.TaskGroup() as tg:
+            tg.create_task(
+                dp.start_polling(bot, allowed_updates=dp.resolve_used_update_types())
+            )
+            tg.create_task(scheduler.start(bot, settings))
+            tg.create_task(notifier.start())
     finally:
         await bot.session.close()
